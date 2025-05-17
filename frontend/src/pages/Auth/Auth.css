@@ -1,0 +1,104 @@
+.auth-container {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card Overrides */
+.card {
+    background-color: #F3F4ED;
+    box-shadow: 0 0 10px rgba(46, 55, 48, 0.6);
+    color: #2e3730;
+    font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+    border: none;
+    border-radius: 10px;
+}
+
+.card h3 {
+    font-size: 1.8em;
+    font-weight: 400;
+    color: rgba(46, 55, 48, 0.75);
+    text-align: center;
+}
+
+/* Form controls */
+.form-control {
+    font-size: 1em;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.2);
+    padding: 0.75em 1em;
+}
+
+.form-control:focus {
+    border-color: #a2a2e8;
+    box-shadow: 0 0 0 0.2rem rgba(162, 162, 232, 0.278);
+}
+
+img.rounded-circle {
+    transition: transform 0.2s;
+}
+
+img.rounded-circle:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+/* Button styling */
+.btn-success {
+    background-color: #42855B;
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-success:hover {
+    background-color: #90B77D;
+}
+
+.btn:disabled {
+    background-color: #9ea19f !important;
+    border-color: #4e4e4e !important;
+    color: #4e4e4e !important;
+}
+
+.validate .btn {
+    background-color: transparent;
+    color: #2e373084;
+    border: 1px solid #2e373084;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.validate .btn:hover {
+    background-color: #2e373084;
+    color: white;
+}
+
+.alert-danger {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+}
+
+/* Error messages */
+.wrong,
+.text-danger {
+    color: rgba(251, 83, 83, 0.783) !important;
+}
+
+/* Links */
+a {
+    color: rgba(72, 146, 211, 0.8);
+    text-decoration: underline;
+}
+
+/* Responsive overrides */
+@media only screen and (max-width: 768px) {
+    .card {
+        padding: 1.5rem;
+    }
+
+    .card h3 {
+        font-size: 1.5em;
+    }
+}
