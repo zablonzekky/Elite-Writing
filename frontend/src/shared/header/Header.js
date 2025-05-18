@@ -84,8 +84,7 @@ const Header = () => {
 
       <div className="container mt-2"> {/* Reduced margin-top */}
         <p className="lead mb-2">
-          Gabrielle, Video Editor – Find the perfect freelance services for your business
-        </p>
+          RACHAEL, freelancer – Upgrade your cv to meet ATS compliance and optimize Social media presence for your Business        </p>
       </div>
     </header>
   );

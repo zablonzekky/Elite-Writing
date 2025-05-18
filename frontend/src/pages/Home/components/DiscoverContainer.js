@@ -1,5 +1,5 @@
 import React from "react";
-import service1 from "./assets/Rakel.jpg"; // Main image
+import service1 from "./assets/Rakel1.jpg"; // Main image
 
 const DiscoverContainer = () => {
   return (
@@ -13,7 +13,7 @@ const DiscoverContainer = () => {
             className="rounded shadow"
             style={{
               maxHeight: "300px",   // Limit height
-              width: "auto",        // Preserve aspect ratio
+              width: "autopx",        // Preserve aspect ratio
               maxWidth: "100%",     // Responsive
               objectFit: "cover",
             }}
@@ -21,7 +21,7 @@ const DiscoverContainer = () => {
         </div>
         <div className="col-md-7">
           <h3 className="fw-bold">Rachael Nasipwondi Wabwoba</h3>
-          <h5 className="text-muted mb-3">Freelance CV & Career Document Specialist</h5>
+          <h5 className="text-muted mb-3">Freelance CV & Social Media accounts manager Specialist</h5>
           <p>
             I help professionals unlock career opportunities through expertly crafted CVs,
             optimized LinkedIn profiles, and persuasive cover letters. With a keen eye for detail

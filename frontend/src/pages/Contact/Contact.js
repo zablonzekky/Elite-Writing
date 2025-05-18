@@ -35,14 +35,14 @@ const Contact = () => {
                   <FaPhone className="text-primary me-3 fs-4" />
                   <div>
                     <h5 className="mb-0 fw-bold">Phone</h5>
-                    <a href="tel:+254712345678" className="text-decoration-none">+254 712 345 678</a>
+                    <a href="tel:+254712345678" className="text-decoration-none">+254 746902227</a>
                   </div>
                 </li>
                 <li className="mb-3 d-flex align-items-center">
                   <FaMapMarkerAlt className="text-primary me-3 fs-4" />
                   <div>
                     <h5 className="mb-0 fw-bold">Location</h5>
-                    <p className="mb-0">Bungoma, Kenya</p>
+                    <p className="mb-0">Nairobi, Kenya</p>
                   </div>
                 </li>
               </ul>

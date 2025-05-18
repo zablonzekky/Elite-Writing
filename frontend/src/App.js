@@ -5,10 +5,8 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-d
 import Home from './pages/Home/Home';
 import Header from './shared/header/Header';
 import Auth from './pages/Auth/Auth';
-import Upload from './pages/Upload/Upload';
 import Delete from './pages/Delete/Delete';
 import View from './pages/View/View';
-import Update from './pages/Update/Update';
 import Services from './pages/Services/Services';
 import About from './pages/About/About';
 import Contact from './pages/Contact/Contact';
@@ -67,7 +65,6 @@ function App() {
                     <View />
                   </>
                 </Route>
-                <Route path="/update/:pid" exact component={Update} />
                 <Route path="/services" exact component={Services} />
                 <Route path="/pricing" exact component={Pricing} />
                 <Route path="/about" exact component={About} />
@@ -90,7 +87,6 @@ function App() {
                     <Home />
                   </>
                 </Route>
-                <Route path="/upload" exact component={Upload} />
                 <Route path="/view/:pid" exact>
                   <>
                     <Header minimal />
@@ -98,7 +94,6 @@ function App() {
                   </>
                 </Route>
                 <Route path="/delete/:pid" exact component={Delete} />
-                <Route path="/update/:pid" exact component={Update} />
                 <Route path="/services" exact component={Services} />
                 <Route path="/pricing" exact component={Pricing} />
                 <Route path="/about" exact component={About} />
