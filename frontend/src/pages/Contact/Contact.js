@@ -1,25 +1,68 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../../shared/header/Header';
 import Footer from '../Home/components/Footer';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaTwitter, FaFacebook, FaWhatsapp } from 'react-icons/fa';
+import {
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaLinkedin,
+  FaTwitter,
+  FaFacebook,
+  FaWhatsapp,
+} from 'react-icons/fa';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+
+  const [status, setStatus] = useState({ loading: false, success: null, error: null });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus({ loading: true, success: null, error: null });
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) throw new Error('Something went wrong. Please try again.');
+
+      setStatus({ loading: false, success: 'Message sent successfully!', error: null });
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      setStatus({ loading: false, success: null, error: error.message });
+    }
+  };
+
   return (
     <>
       <Header />
-      
+
       {/* Hero Section */}
       <section className="bg-primary text-white py-5">
         <div className="container text-center py-4">
           <h1 className="display-5 fw-bold">Get in Touch</h1>
-          <p className="lead">We'd love to hear from you! Reach out for inquiries, collaborations, or support.</p>
+          <p className="lead">
+            We'd love to hear from you! Reach out for inquiries, collaborations, or support.
+          </p>
         </div>
       </section>
 
-      {/* Contact Details & Form */}
+      {/* Contact Info & Form */}
       <div className="container my-5">
         <div className="row g-4">
-          {/* Contact Information */}
+          {/* Contact Info */}
           <div className="col-lg-6">
             <div className="card border-0 shadow-sm p-4 h-100">
               <h3 className="mb-4 fw-bold">Contact Information</h3>
@@ -28,14 +71,18 @@ const Contact = () => {
                   <FaEnvelope className="text-primary me-3 fs-4" />
                   <div>
                     <h5 className="mb-0 fw-bold">Email</h5>
-                    <a href="mailto:support@elitewritingservices.com" className="text-decoration-none">support@elitewritingservices.com</a>
+                    <a href="mailto:support@elitewritingservices.com" className="text-decoration-none">
+                      support@elitewritingservices.com
+                    </a>
                   </div>
                 </li>
                 <li className="mb-3 d-flex align-items-center">
                   <FaPhone className="text-primary me-3 fs-4" />
                   <div>
                     <h5 className="mb-0 fw-bold">Phone</h5>
-                    <a href="tel:+254712345678" className="text-decoration-none">+254 746902227</a>
+                    <a href="tel:+254746902227" className="text-decoration-none">
+                      +254 746902227
+                    </a>
                   </div>
                 </li>
                 <li className="mb-3 d-flex align-items-center">
@@ -50,36 +97,16 @@ const Contact = () => {
               <div className="mt-4">
                 <h5 className="fw-bold mb-3">Follow Us</h5>
                 <div className="d-flex gap-3">
-                  <a
-                    href="https://www.linkedin.com/in/rachael-wabwoba-526a30237/"
-                    className="text-dark"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href="https://www.linkedin.com/in/rachael-wabwoba-526a30237/" className="text-dark" target="_blank" rel="noopener noreferrer">
                     <FaLinkedin size={24} />
                   </a>
-                  <a
-                    href="https://twitter.com/ewwabwoba"
-                    className="text-dark"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href="https://twitter.com/ewwabwoba" className="text-dark" target="_blank" rel="noopener noreferrer">
                     <FaTwitter size={24} />
                   </a>
-                  <a
-                    href="https://www.facebook.com/"
-                    className="text-dark"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href="https://www.facebook.com/" className="text-dark" target="_blank" rel="noopener noreferrer">
                     <FaFacebook size={24} />
                   </a>
-                  <a
-                    href="https://wa.me/254746902227"
-                    className="text-dark"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href="https://wa.me/254746902227" className="text-dark" target="_blank" rel="noopener noreferrer">
                     <FaWhatsapp size={24} />
                   </a>
                 </div>
@@ -91,31 +118,65 @@ const Contact = () => {
           <div className="col-lg-6">
             <div className="card border-0 shadow-sm p-4 h-100">
               <h3 className="mb-4 fw-bold">Send Us a Message</h3>
-              <form>
+
+              {status.success && <div className="alert alert-success">{status.success}</div>}
+              {status.error && <div className="alert alert-danger">{status.error}</div>}
+
+              <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label htmlFor="name" className="form-label">Name</label>
-                  <input type="text" className="form-control" id="name" placeholder="Your Name" required />
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">Email</label>
-                  <input type="email" className="form-control" id="email" placeholder="Your Email" required />
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="subject" className="form-label">Subject</label>
-                  <input type="text" className="form-control" id="subject" placeholder="Subject" required />
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="message" className="form-label">Message</label>
-                  <textarea className="form-control" id="message" rows="5" placeholder="Your Message" required></textarea>
+                  <textarea
+                    className="form-control"
+                    id="message"
+                    rows="5"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                  ></textarea>
                 </div>
-                <button type="submit" className="btn btn-primary w-100 py-2">Send Message</button>
+                <button type="submit" className="btn btn-primary w-100 py-2" disabled={status.loading}>
+                  {status.loading ? 'Sending...' : 'Send Message'}
+                </button>
               </form>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Google Map Embed (Optional) */}
+      {/* Map Embed */}
       <div className="container mb-5">
         <div className="card border-0 shadow-sm overflow-hidden">
           <iframe

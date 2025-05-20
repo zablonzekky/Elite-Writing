@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 
 import { AuthContext } from "../../shared/context/auth-context";
 import LoadingSpinner from "../../shared/loadingSpinner/LoadingSpinner";
@@ -20,6 +20,7 @@ const Auth = (props) => {
   const [receivedCode, setReceivedCode] = useState();
 
   const auth = useContext(AuthContext);
+  const history = useHistory(); // ← useHistory instead of useNavigate
 
   useEffect(() => {
     fetch('http://localhost:5000/user/users')
@@ -77,10 +78,15 @@ const Auth = (props) => {
       });
 
       const data = await res.json();
-      if (!res.ok) setError(data.message);
-      else auth.login(data.userId, data.token);
+      if (!res.ok) {
+        setError(data.message);
+      } else {
+        auth.login(data.userId, data.token);
+        history.push('/profile'); // ← changed navigate to history.push
+      }
     } catch (err) {
       console.log(err);
+      setError("Login failed. Please try again.");
     }
 
     setLoading(false);
@@ -102,6 +108,7 @@ const Auth = (props) => {
       else setReceivedCode(data.code);
     } catch (err) {
       console.log(err);
+      setError("Validation failed. Try again.");
     }
 
     setLoading(false);
@@ -126,9 +133,10 @@ const Auth = (props) => {
 
       const data = await res.json();
       if (!res.ok) setError(data.message);
-      else auth.login(data.userId, data.token);
+      else history.push('/login'); // ← changed navigate to history.push
     } catch (err) {
       console.log(err);
+      setError("Signup failed. Please try again.");
     }
 
     setLoading(false);
