@@ -1,5 +1,5 @@
 const HttpError = require("../models/http-error");
-const User = require("../models/user");
+const User = require('../models/User');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
@@ -9,7 +9,7 @@ require("dotenv").config();
 const generateCode = () =>
   Array.from({ length: 4 }, () => Math.floor(Math.random() * 10)).join("");
 
-// === Nodemailer Transport Setup (Move to utils/email.js if reused) ===
+// === Nodemailer Transport Setup ===
 const createTransporter = () =>
   nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -27,6 +27,7 @@ const getUsers = async (req, res, next) => {
     const users = await User.find({}, "-password");
     res.status(200).json({ users: users.map((u) => u.toObject({ getters: true })) });
   } catch (err) {
+    console.error("getUsers error:", err);
     return next(new HttpError("Fetching users failed", 500));
   }
 };
@@ -39,6 +40,7 @@ const getUser = async (req, res, next) => {
     if (!user) throw new Error();
     res.status(200).json({ user: user.toObject({ getters: true }) });
   } catch (err) {
+    console.error("getUser error:", err);
     return next(new HttpError("User not found", 404));
   }
 };
@@ -61,6 +63,7 @@ const login = async (req, res, next) => {
 
     res.status(200).json({ userId: user.id, email: user.email, token });
   } catch (err) {
+    console.error("login error:", err);
     return next(new HttpError("Login failed. Try again later.", 500));
   }
 };
@@ -90,6 +93,7 @@ const checkEmail = async (req, res, next) => {
 
     res.status(200).json({ code: hashedCode });
   } catch (err) {
+    console.error("checkEmail error:", err);
     return next(new HttpError("Failed to send verification email", 500));
   }
 };
@@ -136,6 +140,7 @@ const signup = async (req, res, next) => {
 
     res.status(201).json({ userId: user.id, email: user.email, token });
   } catch (err) {
+    console.error("signup error:", err);
     return next(new HttpError("Signup failed", 500));
   }
 };
