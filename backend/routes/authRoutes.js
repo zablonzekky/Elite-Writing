@@ -76,30 +76,26 @@ router.post('/validate-email', async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'zablonzekky21@gmail.com', // ⚠️ Use environment variables for production
-        pass: '6wekesa6' // ⚠️ Use an app password + store in .env
+        user: 'zablonzekky21@gmail.com', // ← replace with your real Gmail
+        pass: 'pljy olrs jslg sgwc' // ← use an app password
       }
     });
 
-    // Send the activation code
-    await transporter.sendMail({
-      from: '"Elite Writing Services" <zablonzekky21@gmail.com>',
+    const mailOptions = {
+      from: 'zablonzekky21@gmail.com',
       to: email,
       subject: 'Your Activation Code',
-      text: `Hello ${name || ''}, your activation code is: ${code}`,
-      html: `<p>Hello ${name || ''},</p><p>Your activation code is: <strong>${code}</strong></p>`
-    });
+      html: `<p>Hi ${name || 'there'},</p>
+             <p>Your activation code is: <strong>${code}</strong></p>`
+    };
 
-    res.status(200).json({
-      message: 'Activation code sent to email',
-      code, // ⚠️ Only include this for development; remove in production
-      hashedCode // ⚠️ You should save this in the DB instead
-    });
-
-  } catch (error) {
-    console.error('Email sending failed:', error);
-    res.status(500).json({ message: 'Failed to send activation code' });
+    await transporter.sendMail(mailOptions);
+    res.json({ message: 'Activation code sent', code: hashedCode });
+  } catch (err) {
+    console.error('Email send error:', err);
+    res.status(500).json({ message: 'Failed to send email' });
   }
 });
 
+// Export the router
 module.exports = router;

@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 
+// Initialize express app
 const app = express();
 
 // Import routes
@@ -28,11 +29,7 @@ app.use('/static', express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/user', authRoutes);
-
-// Apply rate limiter only to the POST /api/contact/send route
-app.use('/api/contact/send', contactLimiter);
-
-// Contact routes
+app.use('/api/contact/send', contactLimiter); // Apply rate limiter
 app.use('/api/contact', contactRoutes);
 
 // Welcome route

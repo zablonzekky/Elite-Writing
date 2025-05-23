@@ -5,6 +5,9 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
+// In-memory store for verification codes (email -> hashedCode)
+const verificationCodes = new Map();
+
 // === Helper to generate a random 4-digit code ===
 const generateCode = () =>
   Array.from({ length: 4 }, () => Math.floor(Math.random() * 10)).join("");
@@ -68,7 +71,7 @@ const login = async (req, res, next) => {
   }
 };
 
-// === Check Email Before Signup (Verification Code) ===
+// === Check Email Before Signup (Send Verification Code) ===
 const checkEmail = async (req, res, next) => {
   const { email, name } = req.body;
 
@@ -83,6 +86,10 @@ const checkEmail = async (req, res, next) => {
     const code = generateCode();
     const hashedCode = await bcrypt.hash(code, 12);
 
+    // Store hashed code in server-side map with expiry (10 minutes)
+    verificationCodes.set(email, hashedCode);
+    setTimeout(() => verificationCodes.delete(email), 10 * 60 * 1000);
+
     const transporter = createTransporter();
     await transporter.sendMail({
       from: process.env.EMAIL_SENDER,
@@ -91,7 +98,8 @@ const checkEmail = async (req, res, next) => {
       text: `Your Freelance verification code is ${code}`,
     });
 
-    res.status(200).json({ code: hashedCode });
+    // Only send success message, NOT the hashedCode
+    res.status(200).json({ message: "Verification code sent to email" });
   } catch (err) {
     console.error("checkEmail error:", err);
     return next(new HttpError("Failed to send verification email", 500));
@@ -100,11 +108,13 @@ const checkEmail = async (req, res, next) => {
 
 // === Signup New User ===
 const signup = async (req, res, next) => {
-  const { name, email, password, hashedCode, code } = req.body;
+  const { name, email, password, code } = req.body;
 
   try {
-    if (!await bcrypt.compare(code, hashedCode)) {
-      return next(new HttpError("Verification code is incorrect", 400));
+    const storedHashedCode = verificationCodes.get(email);
+
+    if (!storedHashedCode || !(await bcrypt.compare(code, storedHashedCode))) {
+      return next(new HttpError("Verification code is incorrect or expired", 400));
     }
 
     const userExists = await User.findOne({ $or: [{ email }, { name }] });
@@ -123,6 +133,9 @@ const signup = async (req, res, next) => {
     });
 
     await user.save();
+
+    // Clear verification code after successful signup
+    verificationCodes.delete(email);
 
     const token = jwt.sign(
       { userId: user.id, email: user.email },

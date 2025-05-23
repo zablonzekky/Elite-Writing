@@ -7,8 +7,8 @@ const transporter = nodemailer.createTransport({
   port: process.env.EMAIL_PORT,
   secure: false, // true for 465, false for other ports
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_SENDER,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
@@ -25,7 +25,7 @@ exports.sendMessage = async (req, res) => {
 
     // Prepare email notification content
     const mailOptions = {
-      from: `"Elite Writing Services" <${process.env.EMAIL_USER}>`,
+      from: `"Elite Writing Services" <${process.env.EMAIL_SENDER}>`,
       to: process.env.NOTIFY_EMAIL,  // <-- your client's notification email
       subject: `New Contact Message: ${subject}`,
       text: `

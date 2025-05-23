@@ -16,11 +16,11 @@ const Auth = (props) => {
   const [email, setEmail] = useState({ value: '', isValid: true });
   const [password, setPassword] = useState({ value: '', isValid: true });
   const [isFormValid, setIsFormValid] = useState(true);
-  const [code, setCode] = useState("c");
+  const [code, setCode] = useState("");               // <-- changed from "c" to ""
   const [receivedCode, setReceivedCode] = useState();
 
   const auth = useContext(AuthContext);
-  const history = useHistory(); // ← useHistory instead of useNavigate
+  const history = useHistory();
 
   useEffect(() => {
     fetch('http://localhost:5000/user/users')
@@ -82,7 +82,7 @@ const Auth = (props) => {
         setError(data.message);
       } else {
         auth.login(data.userId, data.token);
-        history.push('/profile'); // ← changed navigate to history.push
+        history.push('/profile');
       }
     } catch (err) {
       console.log(err);
@@ -104,8 +104,11 @@ const Auth = (props) => {
       });
 
       const data = await res.json();
-      if (!res.ok) setError(data.message);
-      else setReceivedCode(data.code);
+      if (!res.ok) {
+        setError(data.message);
+      } else {
+        setReceivedCode(data.code);
+      }
     } catch (err) {
       console.log(err);
       setError("Validation failed. Try again.");
@@ -118,6 +121,9 @@ const Auth = (props) => {
     event.preventDefault();
     setLoading(true);
 
+    console.log("User entered code:", code.trim());
+    console.log("Hashed code from backend:", receivedCode);
+
     try {
       const res = await fetch('http://localhost:5000/user/signup', {
         method: 'POST',
@@ -126,14 +132,17 @@ const Auth = (props) => {
           name: username.value,
           email: email.value,
           password: password.value,
-          code: code,
+          code: code.trim(),
           hashedCode: receivedCode
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) setError(data.message);
-      else history.push('/login'); // ← changed navigate to history.push
+      if (!res.ok) {
+        setError(data.message);
+      } else {
+        history.push('/login');
+      }
     } catch (err) {
       console.log(err);
       setError("Signup failed. Please try again.");
@@ -141,6 +150,12 @@ const Auth = (props) => {
 
     setLoading(false);
   };
+
+  // New validation for activation code input
+  const isActivationCodeValid = code.trim().length > 0;
+
+  // Enable submit button depending on phase
+  const submitButtonEnabled = receivedCode ? isActivationCodeValid : isFormValid;
 
   return (
     <>
@@ -196,7 +211,7 @@ const Auth = (props) => {
                 <button
                   type="submit"
                   className="btn btn-primary w-100 mb-3"
-                  disabled={!isFormValid}
+                  disabled={!submitButtonEnabled}
                 >
                   {receivedCode ? "Activate" : props.login ? "Login" : "Sign Up"}
                 </button>
