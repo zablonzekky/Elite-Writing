@@ -1,4 +1,5 @@
-[build]
-  base = "."                  # Start from the root of your repo
-  publish = "frontend/build"  # Explicit path to your build folder
-  command = "cd frontend && npm run build"  # Ensures build runs in the right directory
+  [build]
+  base = "frontend"
+  publish = "build"
+  command = "npm run build"
+
