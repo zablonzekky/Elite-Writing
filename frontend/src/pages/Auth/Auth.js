@@ -10,13 +10,14 @@ import "./Auth.css";
 const Auth = (props) => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [username, setUsername] = useState({ value: '', isValid: true });
   const [email, setEmail] = useState({ value: '', isValid: true });
   const [password, setPassword] = useState({ value: '', isValid: true });
   const [isFormValid, setIsFormValid] = useState(true);
-  const [code, setCode] = useState("");               // <-- changed from "c" to ""
+  const [code, setCode] = useState("");
   const [receivedCode, setReceivedCode] = useState();
 
   const auth = useContext(AuthContext);
@@ -108,6 +109,7 @@ const Auth = (props) => {
         setError(data.message);
       } else {
         setReceivedCode(data.code);
+        setError('');
       }
     } catch (err) {
       console.log(err);
@@ -120,9 +122,6 @@ const Auth = (props) => {
   const signupHandler = async (event) => {
     event.preventDefault();
     setLoading(true);
-
-    console.log("User entered code:", code.trim());
-    console.log("Hashed code from backend:", receivedCode);
 
     try {
       const res = await fetch('http://localhost:5000/user/signup', {
@@ -141,7 +140,11 @@ const Auth = (props) => {
       if (!res.ok) {
         setError(data.message);
       } else {
-        history.push('/login');
+        setSuccess(true);
+        setError('');
+        setTimeout(() => {
+          history.push('/login');
+        }, 2000);
       }
     } catch (err) {
       console.log(err);
@@ -151,10 +154,7 @@ const Auth = (props) => {
     setLoading(false);
   };
 
-  // New validation for activation code input
   const isActivationCodeValid = code.trim().length > 0;
-
-  // Enable submit button depending on phase
   const submitButtonEnabled = receivedCode ? isActivationCodeValid : isFormValid;
 
   return (
@@ -207,11 +207,16 @@ const Auth = (props) => {
                 )}
 
                 {error && <div className="alert alert-danger">{error}</div>}
+                {success && (
+                  <div className="alert alert-success text-center">
+                    ✅ Activation successful! Redirecting to login...
+                  </div>
+                )}
 
                 <button
                   type="submit"
                   className="btn btn-primary w-100 mb-3"
-                  disabled={!submitButtonEnabled}
+                  disabled={!submitButtonEnabled || success}
                 >
                   {receivedCode ? "Activate" : props.login ? "Login" : "Sign Up"}
                 </button>

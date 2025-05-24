@@ -1,70 +1,5 @@
-// const User = require('../models/User');
-// const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken');
-
-// // @desc    Register new user
-// exports.signup = async (req, res, next) => {
-//   try {
-//     const { email, password } = req.body;
-
-//     // Check if user exists
-//     let user = await User.findOne({ email });
-//     if (user) {
-//       return res.status(400).json({ message: 'User already exists' });
-//     }
-
-//     // Create user
-//     user = new User({
-//       email,
-//       password: await bcrypt.hash(password, 10)
-//     });
-
-//     await user.save();
-
-//     // Generate token
-//     const token = jwt.sign(
-//       { userId: user._id },
-//       process.env.JWT_SECRET,
-//       { expiresIn: '1h' }
-//     );
-
-//     res.status(201).json({ token, userId: user._id });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// // @desc    Authenticate user
-// exports.login = async (req, res, next) => {
-//   try {
-//     const { email, password } = req.body;
-
-//     // Find user
-//     const user = await User.findOne({ email });
-//     if (!user) {
-//       return res.status(401).json({ message: 'Invalid credentials' });
-//     }
-
-//     // Validate password
-//     const isMatch = await bcrypt.compare(password, user.password);
-//     if (!isMatch) {
-//       return res.status(401).json({ message: 'Invalid credentials' });
-//     }
-
-//     // Generate token
-//     const token = jwt.sign(
-//       { userId: user._id },
-//       process.env.JWT_SECRET,
-//       { expiresIn: '1h' }
-//     );
-
-//     res.json({ token, userId: user._id });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
 const HttpError = require("../models/http-error");
-const User = require('../models/User');
+const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
@@ -74,7 +9,7 @@ require("dotenv").config();
 const generateCode = () =>
   Array.from({ length: 4 }, () => Math.floor(Math.random() * 10)).join("");
 
-// === Nodemailer Transport Setup (Move to utils/email.js if reused) ===
+// === Nodemailer Transport Setup ===
 const createTransporter = () =>
   nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -92,18 +27,19 @@ const getUsers = async (req, res, next) => {
     const users = await User.find({}, "-password");
     res.status(200).json({ users: users.map((u) => u.toObject({ getters: true })) });
   } catch (err) {
+    console.error("❌ Get Users Error:", err);
     return next(new HttpError("Fetching users failed", 500));
   }
 };
 
 // === Get Single User ===
 const getUser = async (req, res, next) => {
-  const uid = req.params.uid;
   try {
-    const user = await User.findById(uid, "-password");
-    if (!user) throw new Error();
+    const user = await User.findById(req.params.uid, "-password");
+    if (!user) throw new Error("User not found");
     res.status(200).json({ user: user.toObject({ getters: true }) });
   } catch (err) {
+    console.error("❌ Get User Error:", err);
     return next(new HttpError("User not found", 404));
   }
 };
@@ -114,7 +50,14 @@ const login = async (req, res, next) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user) {
+      console.warn("⚠️ Login failed: Email not found");
+      return next(new HttpError("Invalid credentials", 401));
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      console.warn("⚠️ Login failed: Incorrect password");
       return next(new HttpError("Invalid credentials", 401));
     }
 
@@ -124,21 +67,27 @@ const login = async (req, res, next) => {
       { expiresIn: "2h" }
     );
 
+    console.log(`✅ Login successful for user: ${email}`);
     res.status(200).json({ userId: user.id, email: user.email, token });
   } catch (err) {
+    console.error("❌ Login Error:", err);
     return next(new HttpError("Login failed. Try again later.", 500));
   }
 };
 
-// === Check Email Before Signup (Verification Code) ===
+// === Check Email Before Signup (Send Code) ===
 const checkEmail = async (req, res, next) => {
   const { email, name } = req.body;
 
   try {
-    const userEmail = await User.findOne({ email });
-    const userName = await User.findOne({ name });
+    if (!email || !name) {
+      return next(new HttpError("Email and name are required", 400));
+    }
 
-    if (userEmail || userName) {
+    const existingEmail = await User.findOne({ email });
+    const existingName = await User.findOne({ name });
+
+    if (existingEmail || existingName) {
       return next(new HttpError("User already exists", 409));
     }
 
@@ -150,11 +99,13 @@ const checkEmail = async (req, res, next) => {
       from: process.env.EMAIL_SENDER,
       to: email,
       subject: "Your Verification Code",
-      text: `Your Freelance verification code is ${code}`,
+      text: `Your Freelance verification code is: ${code}`,
     });
 
+    console.log(`✅ Verification code sent to ${email}`);
     res.status(200).json({ code: hashedCode });
   } catch (err) {
+    console.error("❌ Verification Email Error:", err);
     return next(new HttpError("Failed to send verification email", 500));
   }
 };
@@ -164,7 +115,13 @@ const signup = async (req, res, next) => {
   const { name, email, password, hashedCode, code } = req.body;
 
   try {
-    if (!await bcrypt.compare(code, hashedCode)) {
+    if (!name || !email || !password || !hashedCode || !code) {
+      return next(new HttpError("All fields are required", 400));
+    }
+
+    const isCodeValid = await bcrypt.compare(code, hashedCode);
+    if (!isCodeValid) {
+      console.warn(`⚠️ Incorrect verification code for ${email}`);
       return next(new HttpError("Verification code is incorrect", 400));
     }
 
@@ -192,15 +149,21 @@ const signup = async (req, res, next) => {
     );
 
     const transporter = createTransporter();
-    await transporter.sendMail({
-      from: process.env.EMAIL_SENDER,
-      to: email,
-      subject: "Welcome to Freelance!",
-      text: "You've successfully signed up. Welcome aboard!",
-    });
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_SENDER,
+        to: email,
+        subject: "Welcome to Freelance!",
+        text: "You've successfully signed up. Welcome aboard!",
+      });
+    } catch (emailError) {
+      console.warn("⚠️ Signup succeeded but welcome email failed:", emailError.message);
+    }
 
+    console.log(`✅ Signup successful for user: ${email}`);
     res.status(201).json({ userId: user.id, email: user.email, token });
   } catch (err) {
+    console.error("❌ Signup Error:", err);
     return next(new HttpError("Signup failed", 500));
   }
 };
