@@ -49,13 +49,20 @@ const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
+    console.log("➡️ Login attempt for:", email);
+    console.log("➡️ Password received from frontend:", password);
+
     const user = await User.findOne({ email });
     if (!user) {
       console.warn("⚠️ Login failed: Email not found");
       return next(new HttpError("Invalid credentials", 401));
     }
 
+    console.log("➡️ Hashed password in DB:", user.password);
+
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log("🔍 Password match result:", isMatch);
+
     if (!isMatch) {
       console.warn("⚠️ Login failed: Incorrect password");
       return next(new HttpError("Invalid credentials", 401));
