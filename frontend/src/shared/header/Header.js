@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import logo from '../../logo.png';  // Adjust path if logo is not in this location
 
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { AuthContext } from "../context/auth-context";
 
 const Header = () => {
@@ -9,7 +9,7 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  const history = useHistory();
+  // Removed: const history = useHistory();
   const auth = useContext(AuthContext);
 
   useEffect(() => {
@@ -85,7 +85,8 @@ const Header = () => {
 
       <div className="container mt-2"> {/* Reduced margin-top */}
         <p className="lead mb-2">
-          RACHAEL, freelancer – Upgrade your cv to meet ATS compliance and optimize Social media presence for your Business        </p>
+          RACHAEL, freelancer – Upgrade your cv to meet ATS compliance and optimize Social media presence for your Business
+        </p>
       </div>
     </header>
   );

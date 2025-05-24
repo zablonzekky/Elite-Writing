@@ -29,3 +29,5 @@ yarn-error.log*
 
 # exclude ONLY system-specific or environment files
 # allow all static assets including images
+*.png
+src/logo.png
