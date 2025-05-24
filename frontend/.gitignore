@@ -7,17 +7,25 @@
 
 # testing
 /coverage
+
+# dev/prod server
 server.js
-# production
+
+# production build
 /build
 
-# misc
+# system/misc
 .DS_Store
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# exclude ONLY system-specific or environment files
+# allow all static assets including images

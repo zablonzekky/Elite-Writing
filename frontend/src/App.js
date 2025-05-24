@@ -5,8 +5,6 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-d
 import Home from './pages/Home/Home';
 import Header from './shared/header/Header';
 import Auth from './pages/Auth/Auth';
-import Delete from './pages/Delete/Delete';
-import View from './pages/View/View';
 import Services from './pages/Services/Services';
 import About from './pages/About/About';
 import Contact from './pages/Contact/Contact';
@@ -56,50 +54,16 @@ function App() {
               </>
             </Route>
 
-            {/* Routes for non-logged-in users */}
-            {!token && (
+            <Route path="/services" exact component={Services} />
+            <Route path="/pricing" exact component={Pricing} />
+            <Route path="/about" exact component={About} />
+            <Route path="/contact" exact component={Contact} />
+            <Route path="/" exact>
               <>
-                <Route path="/view/:pid" exact>
-                  <>
-                    <Header minimal />
-                    <View />
-                  </>
-                </Route>
-                <Route path="/services" exact component={Services} />
-                <Route path="/pricing" exact component={Pricing} />
-                <Route path="/about" exact component={About} />
-                <Route path="/contact" exact component={Contact} />
-                <Route path="/" exact>
-                  <>
-                    <Header />
-                    <Home />
-                  </>
-                </Route>
+                <Header />
+                <Home />
               </>
-            )}
-
-            {/* Routes for logged-in users */}
-            {token && (
-              <>
-                <Route path="/" exact>
-                  <>
-                    <Header />
-                    <Home />
-                  </>
-                </Route>
-                <Route path="/view/:pid" exact>
-                  <>
-                    <Header minimal />
-                    <View />
-                  </>
-                </Route>
-                <Route path="/delete/:pid" exact component={Delete} />
-                <Route path="/services" exact component={Services} />
-                <Route path="/pricing" exact component={Pricing} />
-                <Route path="/about" exact component={About} />
-                <Route path="/contact" exact component={Contact} />
-              </>
-            )}
+            </Route>
 
             {/* Redirect any unknown route to home */}
             <Redirect to="/" />

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-<img src="/logo.png" alt="Logo" />
+import logo from '../../logo.png';  // Adjust path if logo is not in this location
 
 import { NavLink, useHistory } from 'react-router-dom';
 import { AuthContext } from "../context/auth-context";
