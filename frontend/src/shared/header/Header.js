@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import logo from '../../logo.png'; // remove one dot
+import logo from '../../logo.png';
 
 import { NavLink, useHistory } from 'react-router-dom';
 import { AuthContext } from "../context/auth-context";
