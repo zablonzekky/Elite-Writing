@@ -9,7 +9,7 @@ const {
   login,
 } = require('../controllers/authController');
 
-const User = require('../models/User');
+const User = require('../models/user');
 
 // Signup Route
 router.post(
