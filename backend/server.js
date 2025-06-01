@@ -7,6 +7,13 @@ const rateLimit = require('express-rate-limit');
 
 // Initialize express app
 const app = express();
+const cors = require('cors');
+
+app.use(cors({
+  origin: 'https://elitewriting.netlify.app/', // replace with your actual Netlify domain
+  credentials: true,
+}));
+
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');

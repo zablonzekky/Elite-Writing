@@ -30,9 +30,7 @@ const Contact = () => {
     setStatus({ loading: true, success: null, error: null });
 
     try {
-      //const response = await fetch('/api/contact', {
-      const response = await fetch('http://localhost:5000/api/contact/send', {
-
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/contact/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
