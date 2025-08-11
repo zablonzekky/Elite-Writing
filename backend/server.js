@@ -10,7 +10,7 @@ const app = express();
 const cors = require('cors');
 
 app.use(cors({
-  origin: 'https://elitewriting.netlify.app/', // replace with your actual Netlify domain
+  origin: 'https://kalis-app.onrender.com/', // replace with your actual Netlify domain
   credentials: true,
 }));
 
