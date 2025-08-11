@@ -7,13 +7,12 @@ const rateLimit = require('express-rate-limit');
 
 // Initialize express app
 const app = express();
-const cors = require('cors');
 
+// CORS middleware (only once)
 app.use(cors({
-  origin: 'https://kalis-app.onrender.com/', // replace with your actual Netlify domain
+  origin: 'https://kalis-app.onrender.com', // replace with your actual frontend domain
   credentials: true,
 }));
-
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -29,7 +28,6 @@ const contactLimiter = rateLimit({
 });
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/static', express.static(path.join(__dirname, 'public')));
