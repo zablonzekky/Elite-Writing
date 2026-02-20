@@ -1,77 +1,25 @@
-import './App.css';
-import React, { useCallback, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
-
-import Home from './pages/Home/Home';
-import Header from './shared/header/Header';
-import Auth from './pages/Auth/Auth';
-import Services from './pages/Services/Services';
-import About from './pages/About/About';
-import Contact from './pages/Contact/Contact';
-import Pricing from './pages/Pricing/Pricing';
-import { AuthContext } from './shared/context/auth-context';
-import UserReviews from './pages/Home/components/UserReviews';
+import React, { useMemo, useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles/theme.scss';
+import AppRouter from './app/router';
+import { clearAuth, loadAuth, saveAuth } from './app/store';
 
 function App() {
-  const [token, setToken] = useState();
-  const [userId, setUserId] = useState();
+  const initial = useMemo(() => loadAuth() || { id: null, role: null, token: null }, []);
+  const [auth, setAuth] = useState(initial);
 
-  const login = useCallback((uid, token) => {
-    setToken(token);
-    setUserId(uid);
-    localStorage.setItem('userData', JSON.stringify({ userId: uid, token }));
-  }, []);
+  const handleLogin = ({ id, role, token }) => {
+    const next = { id, role, token };
+    setAuth(next);
+    saveAuth(next);
+  };
 
-  const logout = useCallback(() => {
-    setToken(null);
-    setUserId(null);
-    localStorage.removeItem('userData');
-  }, []);
+  const handleLogout = () => {
+    setAuth({ id: null, role: null, token: null });
+    clearAuth();
+  };
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('userData'));
-    if (user) {
-      login(user.userId, user.token);
-    }
-  }, [login]);
-
-  return (
-    <AuthContext.Provider value={{ isLoggedIn: !!token, token, userId, login, logout }}>
-      <Router>
-        <main>
-          <Switch>
-            {/* Public routes */}
-            <Route path="/login" exact>
-              <Auth login />
-            </Route>
-            <Route path="/signup" exact>
-              <Auth signup />
-            </Route>
-            <Route path="/reviews" exact>
-              <>
-                <Header />
-                <UserReviews />
-              </>
-            </Route>
-
-            <Route path="/services" exact component={Services} />
-            <Route path="/pricing" exact component={Pricing} />
-            <Route path="/about" exact component={About} />
-            <Route path="/contact" exact component={Contact} />
-            <Route path="/" exact>
-              <>
-                <Header />
-                <Home />
-              </>
-            </Route>
-
-            {/* Redirect any unknown route to home */}
-            <Redirect to="/" />
-          </Switch>
-        </main>
-      </Router>
-    </AuthContext.Provider>
-  );
+  return <AppRouter auth={auth} onLogin={handleLogin} onLogout={handleLogout} />;
 }
 
 export default App;
